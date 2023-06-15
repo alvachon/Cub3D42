@@ -6,7 +6,7 @@
 /*   By: alvachon <alvachon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/22 10:51:15 by llord             #+#    #+#             */
-/*   Updated: 2023/06/15 09:28:54 by alvachon         ###   ########.fr       */
+/*   Updated: 2023/06/15 10:16:57 by alvachon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,6 @@ void	print_tile(t_tile *tile)
 
 void	print_neighbours(t_tile *tile)
 {
-	/*
-	     [x:y]\n
-	[x:y] x:y [x:y]\n
-	     [x:y]\n
-	*/
 	printf("\n     [");
 	print_tile(tile->north);
 	printf("]\n[");
@@ -62,7 +57,8 @@ void	print_tiles(void)
 
 void	announce_tile(t_tile *tile, char c)
 {
-	printf("Created tile at %i:%i with type ", tile->coords->x, tile->coords->y);
+	printf("Created tile at %i:%i with type ", tile->coords->x,
+			tile->coords->y);
 	if (tile->type == TTYPE_ROOM)
 		printf("floor");
 	else if (tile->type == TTYPE_WALL)
@@ -78,7 +74,6 @@ void	print_paths(void)
 	int			i;
 
 	d = get_master();
-
 	i = -1;
 	printf("\n");
 	if (d->t_paths)
@@ -101,20 +96,22 @@ void	print_colours(void)
 	int			i;
 
 	d = get_master();
-
 	i = -1;
 	printf("\n");
 	if (d->c_floor)
-		printf("Floor   : '%i,%i,%i'\n", d->c_floor->r, d->c_floor->g, d->c_floor->b);
+		printf("Floor   : '%i,%i,%i'\n", d->c_floor->r, d->c_floor->g,
+				d->c_floor->b);
 	else
 		printf("Floor   : missing\n");
 	if (d->c_floor)
-		printf("Ceiling : '%i,%i,%i'\n", d->c_ceiling->r, d->c_ceiling->g, d->c_ceiling->b);
+		printf("Ceiling : '%i,%i,%i'\n", d->c_ceiling->r, d->c_ceiling->g,
+				d->c_ceiling->b);
 	else
 		printf("Ceiling : missing\n");
 }
 
 void	print_entity(t_entity *e)
 {
-	printf("\nEntity with radius %.2f at (%.2f : %.2f) looking towards %.2f\n", e->radius, e->vector->x, e->vector->y, e->vector->d);
+	printf("\nEntity with radius %.2f at (%.2f : %.2f) looking towards %.2f\n",
+			e->radius, e->vector->x, e->vector->y, e->vector->d);
 }

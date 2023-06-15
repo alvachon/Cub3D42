@@ -6,23 +6,23 @@
 /*   By: alvachon <alvachon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 08:55:54 by llord             #+#    #+#             */
-/*   Updated: 2023/06/15 09:28:35 by alvachon         ###   ########.fr       */
+/*   Updated: 2023/06/15 10:16:37 by alvachon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3D.h"
 
 //tries to free every tile
+//free the stuff inside the tiles here
 void	free_tiles(t_master *data)
 {
-	int		i;
+	int	i;
 
 	if (data->tiles)
 	{
 		i = -1;
 		while (data->tiles[++i])
 		{
-			//free the stuff inside the tiles here
 			ft_free_null(ADRS data->tiles[i]->coords);
 			ft_free_null(ADRS data->tiles[i]);
 		}
@@ -40,6 +40,7 @@ void	free_entity(t_entity *entity)
 }
 
 //tries to free everything and returns t_master state
+//free the stuff inside d here
 int	free_master(void)
 {
 	t_master	*data;
@@ -47,19 +48,13 @@ int	free_master(void)
 
 	data = get_master();
 	state = data->master_state;
-
-	//free the stuff inside d here
-
 	free_tiles(data);
 	free_entity(data->player);
-
 	ft_free_null(ADRS data->level);
 	ft_free_null(ADRS data->c_ceiling);
 	ft_free_null(ADRS data->c_floor);
 	ft_free_array(ADRS2 data->t_paths);
-//	if (data->window)
-//		mlx_terminate(data->window);
-	ft_free_null(ADRS data); //		MUST BE LAST FREED
+	ft_free_null(ADRS data);
 	return (state);
 }
 
@@ -69,5 +64,5 @@ void	close_with_error(char *err)
 	ft_puterr(err);
 	printf("\n");
 	get_master()->master_state = MSTATE_ERROR;
-	exit (free_master());
+	exit(free_master());
 }

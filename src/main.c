@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: llord <llord@student.42.fr>                +#+  +:+       +#+        */
+/*   By: alvachon <alvachon@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/14 08:55:54 by llord             #+#    #+#             */
-/*   Updated: 2023/06/14 12:12:38 by llord            ###   ########.fr       */
+/*   Updated: 2023/06/15 10:18:07 by alvachon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,7 @@ void	play_game(t_master *data)
 int	main(int ac, char **av)
 {
 	init_game(ac, av);
-
 	play_game(get_master());
-
 	printf("\n");
 	return (free_master());
 }
