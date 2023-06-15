@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   0_initializers.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvachon <alvachon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llord <llord@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 12:50:45 by llord             #+#    #+#             */
-/*   Updated: 2023/06/15 09:41:13 by alvachon         ###   ########.fr       */
+/*   Updated: 2023/06/15 14:00:46 by llord            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3D.h"
 
+//The direction of the player indicate the angle range.
 void	init_player(void)
 {
 	t_master	*data;
@@ -32,8 +33,9 @@ void	init_player(void)
 	data->player = player;
 }
 
-//data->fov_ratio /= sin((180 - (PLAYER_FOV / 2)) * M_PI / 360);
-//	compensates for fish eye effect compensation (lol)
+//Also does the math for reducing the fisheye effect,
+//with the field of view ratio.
+//Added a trigger system to update the raycaster.
 void	init_window(void)
 {
 	t_master	*data;
@@ -46,6 +48,26 @@ void	init_window(void)
 	data->fov_ratio /= sin((180 - (PLAYER_FOV / 2)) * M_PI / 360);
 	data->should_refresh = true;
 	make_canvas();
+}
+
+//verifies each map character and the total map lenght
+void	check_map(void)
+{
+	t_master	*data;
+	int			i;
+
+	data = get_master();
+	i = -1;
+	while (data->level[i + 1] == '\n')
+		i++;
+	i = -1;
+	while (data->level[++i])
+	{
+		if (data->level[i] != '\n' && !is_char_valid(data->level[i]))
+			close_with_error(ERR_MAP_CHAR);
+	}
+	if (data->player_spawn_count != 1)
+		close_with_error(ERR_MAP_PLAYER);
 }
 
 //creates the map grid from the map-info contained in d.level
@@ -67,10 +89,3 @@ void	init_game(int ac, char **av)
 	init_player();
 	init_window();
 }
-
-//0============ DEBUG ============0
-//	printf(">%s<\n\n", get_master()->level);
-//	print_tiles();
-//	print_paths();
-//	print_colours();
-//	print_player();

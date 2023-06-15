@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   0_checkers.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvachon <alvachon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llord <llord@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/22 12:45:01 by llord             #+#    #+#             */
-/*   Updated: 2023/06/15 09:38:35 by alvachon         ###   ########.fr       */
+/*   Updated: 2023/06/15 15:01:06 by llord            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "cub3D.h"
 
-//checks the validity of a map character
+//Check the validity of a map character
 bool	is_char_valid(char c)
 {
 	if (c == ' ' || c == '0' || c == '1')
@@ -25,7 +25,7 @@ bool	is_char_valid(char c)
 	return (false);
 }
 
-//checks if the line at level[start] is the begining of the map
+//Check if the line at level[start] is the start of the map
 bool	is_map_start(int i)
 {
 	char	*level;
@@ -50,27 +50,7 @@ bool	is_map_start(int i)
 	return (true);
 }
 
-//verifies each map character and the total map lenght
-void	check_map(void)
-{
-	t_master	*data;
-	int			i;
-
-	data = get_master();
-	i = -1;
-	while (data->level[i + 1] == '\n')
-		i++;
-	i = -1;
-	while (data->level[++i])
-	{
-		if (data->level[i] != '\n' && !is_char_valid(data->level[i]))
-			close_with_error(ERR_MAP_CHAR);
-	}
-	if (data->player_spawn_count != 1)
-		close_with_error(ERR_MAP_PLAYER);
-}
-
-//Verifies that the texture paths are valid
+//Check validity of texture path
 void	check_assets(void)
 {
 	t_master	*d;
@@ -78,6 +58,7 @@ void	check_assets(void)
 	int			i;
 
 	d = get_master();
+	d->textures = ft_calloc(ASSET_COUNT + 1, sizeof(mlx_texture_t));
 	i = 3;
 	while (i >= 0)
 	{
@@ -87,6 +68,9 @@ void	check_assets(void)
 			if (fd < 0)
 				close_with_error(ERR_FILE_ASSET);
 			close(fd);
+			d->textures[i] = make_texture(d->t_paths[i]);
+			if (!d->textures[i])
+				close_with_error(ERR_FILE_ASSET);
 		}
 		else
 			close_with_error(ERR_FILE_SPECS);
@@ -94,19 +78,29 @@ void	check_assets(void)
 	}
 }
 
-//Verifies that the floor & ceiling colours are within bounds
+//Check colour validity (0 <= c.v <= 255)
+bool	is_colour_valid(int v)
+{
+	if (v < 0 || 255 < v)
+		return (false);
+	else
+		return (true);
+}
+
+//Check floor & ceiling colours are inbounds
 void	check_colours(void)
 {
-	t_master	*d;
+	t_colour	*cc;
+	t_colour	*cf;
 
-	d = get_master();
-	if (!(d->c_ceiling) || !(d->c_floor))
+	cc = get_master()->c_ceiling;
+	cf = get_master()->c_floor;
+	if (!cc || !cf)
 		close_with_error(ERR_FILE_SPECS);
-	if (d->c_ceiling->r > 255 || d->c_ceiling->g > 255 || d->c_ceiling->b > 255 \
-		||
-		d->c_floor->r > 255 || d->c_floor->g > 255 || d->c_floor->b > 255) \
+	if (!is_colour_valid(cc->r) || !is_colour_valid(cc->g) \
+	|| !is_colour_valid(cc->b))
 		close_with_error(ERR_FILE_COLOR);
-	if (d->c_ceiling->r < 0 || d->c_ceiling->g < 0 || d->c_ceiling->b < 0 || \
-		d->c_floor->r < 0 || d->c_floor->g < 0 || d->c_floor->b < 0)
+	if (!is_colour_valid(cf->r) || !is_colour_valid(cf->g) \
+	|| !is_colour_valid(cf->b))
 		close_with_error(ERR_FILE_COLOR);
 }

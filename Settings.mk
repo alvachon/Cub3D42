@@ -6,8 +6,9 @@
 NAME	=	cub3D
 
 # Arguments to call the executable with by default
-ARGS	= ./levels/map_3.cub
-#./levels/map_3.cub
+ARGS	= ./levels/map_4.cub
+
+
 # Directory names
 SRCDIR		=	src/
 OBJDIR		=	bin/
@@ -19,7 +20,6 @@ FILES	=	2_actions \
 			1_raycasters \
 			0_checkers \
 			0_coorders \
-			debugers \
 			4_freeers \
 			3_getters \
 			2_hookers \

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   3_slicers.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alvachon <alvachon@student.42.fr>          +#+  +:+       +#+        */
+/*   By: llord <llord@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/06 11:57:50 by llord             #+#    #+#             */
-/*   Updated: 2023/06/15 10:10:27 by alvachon         ###   ########.fr       */
+/*   Updated: 2023/06/15 15:04:37 by llord            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,43 +33,37 @@ void	draw_square(int x, int y, int c)
 		dy++;
 	}
 }
-//printf("%i (%i) : %i (%i) | %i\n", x, x + dx, y, y + dy, c);
-//		0======== DEBUG ========0
 
 //draws a macro pixel vertical line on the scr (0 is at the right of the center)
-void	draw_slice(t_slice *slice, int screen_pos)
+void	draw_slice(t_master *d, t_slice *slice, int screen_pos)
 {
-	t_master	*d;
+	t_colour	c;
 	int			y;
-	uint32_t	wall_colour[4];
+	int			wall_y;
+	double		floor_shade;
+	double		wall_shade;
 
-	//0======== DEBUG ========0
-	d = get_master();
-	wall_colour[0] = (128 << 24 | 0 << 16 | 0 << 8 | 255);
-	wall_colour[1] = (0 << 24 | 128 << 16 | 0 << 8 | 255);
-	wall_colour[2] = (0 << 24 | 0 << 16 | 128 << 8 | 255);
-	wall_colour[3] = (192 << 24 | 192 << 16 | 1992 << 8 | 255);
-	y = -d->half_height;
-	while (y < d->half_height)
+	wall_shade = (S_FACTOR / (2 * (slice->dist + 1))) + (1 - (S_FACTOR / 2));
+	y = -((d->half_height) + 1);
+	while (++y < d->half_height)
 	{
-		if ((slice->size * -d->half_height) <= y && y < (slice->size
-				* d->half_height))
-			draw_square(screen_pos, y, wall_colour[slice->hit_dir]);
-		//	0======== DEBUG ========0
+		floor_shade = fabs((double)y / (double)d->half_height * \
+			S_FACTOR) + (1 - S_FACTOR);
+		wall_y = slice->size * d->half_height;
+		if (-wall_y <= y && y < wall_y)
+		{
+			c = get_texture_colour(slice, (double)(y + wall_y) / (2 * wall_y));
+			draw_square(screen_pos, y, get_rgba(&c, wall_shade));
+		}
 		else if (y < 0)
-			draw_square(screen_pos, y, get_rgba(d->c_ceiling));
-		//		0======== DEBUG ========0
+			draw_square(screen_pos, y, get_rgba(d->c_ceiling, \
+				((2 - S_FACTOR) - floor_shade)));
 		else
-			draw_square(screen_pos, y, get_rgba(d->c_floor));
-		//		0======== DEBUG ========0
-		y++;
+			draw_square(screen_pos, y, get_rgba(d->c_floor, floor_shade));
 	}
 	ft_free_null(ADRS slice);
 }
 
-//converts a ray struct into a slice struct, used in drawing slices
-//	compensates for fish eye effect
-//	avoids jiterry walls
 t_slice	*create_slice(t_ray *r, double angle)
 {
 	t_slice	*slice;
@@ -80,30 +74,28 @@ t_slice	*create_slice(t_ray *r, double angle)
 		slice->size = 0;
 		return (ft_free_null(ADRS r), slice);
 	}
-	r->ray_dist *= cos(M_PI * angle / 180);
-	slice->size = set_precision(1 / r->ray_dist, 1073741824);
+	slice->dist = r->ray_dist * cos(M_PI * angle / 180);
+	slice->size = set_precision(1 / slice->dist, 1073741824);
 	slice->hit_type = r->hit_type;
-	//also need to find texture_pos and get right texture
 	slice->hit_dir = r->hit_dir;
+	slice->texture_pos = r->wall_pos;
 	ft_free_null(ADRS r);
 	return (slice);
 }
-//	printf("Slice size : %.20f\n", slice->size); //	0======== DEBUG ========0
 
 //initializes the background (canvas) to draw on
 void	make_canvas(void)
 {
 	t_master	*d;
+	int			canvas_colour[4];
 
-	int canvas_colour[4];   //	0======== DEBUG ========0
-	canvas_colour[0] = 0;   //	0======== DEBUG ========0
-	canvas_colour[1] = 0;   //	0======== DEBUG ========0
-	canvas_colour[2] = 0;   //	0======== DEBUG ========0
-	canvas_colour[3] = 255; //	0======== DEBUG ========0
+	canvas_colour[0] = 0;
+	canvas_colour[1] = 0;
+	canvas_colour[2] = 0;
+	canvas_colour[3] = 255;
 	d = get_master();
 	d->canvas = mlx_new_image(d->window, SCREEN_WIDTH, SCREEN_HEIGHT);
 	ft_memfset(d->canvas->pixels, canvas_colour, SCREEN_WIDTH
 		* d->canvas->height * BPP, 4);
-//	0======== DEBUG ========0
 	mlx_image_to_window(d->window, d->canvas, 0, 0);
 }
